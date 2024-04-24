@@ -33,4 +33,15 @@ public class DataController {
         }
     }
 
+    @GetMapping("/fetch-patients")
+    public ResponseEntity<Object> fetchPatients() {
+        try {
+            List<UserInfo> user = authService.fetchPatients();
+            return new ResponseEntity<>(user, HttpStatus.OK);
+        }
+        catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.OK);
+        }
+    }
+
 }

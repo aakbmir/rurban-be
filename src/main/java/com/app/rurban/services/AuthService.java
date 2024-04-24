@@ -21,7 +21,10 @@ public class AuthService {
 
     public List<UserInfo> fetchHospitals() {
         return userInfoRepository.fetchHospitals("Hospital");
+    }
 
+    public List<UserInfo> fetchPatients() {
+        return userInfoRepository.fetchHospitals("Patient");
     }
 
     public UserInfo registerUser(AuthRegisterDTO authRegisterDTO) {
