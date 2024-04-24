@@ -39,6 +39,7 @@ public class AuthService {
         auth.setPassword(authRegisterDTO.getPassword());
         auth.setRegisterType(authRegisterDTO.getRegisterType());
         auth.setPhone(authRegisterDTO.getPhone());
+        auth.setPosition(authRegisterDTO.getPosition());
         return auth;
     }
 

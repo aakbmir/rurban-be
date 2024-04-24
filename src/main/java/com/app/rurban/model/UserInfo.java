@@ -31,5 +31,7 @@ public class UserInfo {
 
     private String registerType;
 
+    private String position;
+
     private String lastLogin;
 }

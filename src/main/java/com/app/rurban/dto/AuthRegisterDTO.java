@@ -14,5 +14,6 @@ public class AuthRegisterDTO {
         private String email;
         private String password;
         private String registerType;
+        private String position;
         private long phone;
 }
