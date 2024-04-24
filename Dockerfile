@@ -9,6 +9,6 @@ RUN gradle build --no-daemon
 FROM openjdk:17-jdk-slim-buster
 WORKDIR /app
 RUN pwd && ls -la
-COPY --from=builder /app/build/libs/rurban-0.0.1-SNAPSHOT.jar /app/rurban.jar
+COPY --from=builder /app/build/libs/rurban-be-0.0.1-SNAPSHOT.jar /app/rurban.jar
 EXPOSE 8080
 CMD ["java", "-jar", "rurban.jar"]
