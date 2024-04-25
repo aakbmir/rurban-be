@@ -20,8 +20,5 @@ public class UserInfo {
     @Column(unique=true)
     private String email;
 
-    @Column(unique=true)
-    private long contact;
-
     private String password;
 }
