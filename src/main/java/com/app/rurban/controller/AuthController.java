@@ -3,13 +3,18 @@ package com.app.rurban.controller;
 import com.app.rurban.dto.AuthLoginDTO;
 import com.app.rurban.dto.AuthRegisterDTO;
 import com.app.rurban.dto.AuthResponseDTO;
-import com.app.rurban.model.UserInfo;
 import com.app.rurban.services.AuthService;
+import com.fasterxml.jackson.databind.util.JSONPObject;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import javax.management.InvalidAttributeValueException;
+import javax.security.auth.login.AccountNotFoundException;
 
 @RestController
 @RequestMapping("api/v1/auth")
@@ -24,18 +29,34 @@ public class AuthController {
         return "up and running";
     }
 
-    @PostMapping("/register")
-    public ResponseEntity<Object> getRegister(@RequestBody AuthRegisterDTO authRegisterDTO) {
+    @PostMapping("/register-user")
+    public ResponseEntity<Object> registerUser(@RequestBody AuthRegisterDTO authRegisterDTO) throws JSONException {
+        JSONObject json = new JSONObject();
         try {
             System.out.println(authRegisterDTO);
             return new ResponseEntity<>(authService.registerUser(authRegisterDTO), HttpStatus.OK);
-
-        }catch (DataIntegrityViolationException e) {
+        } catch (DataIntegrityViolationException e) {
             String errorMessage = extractConstraintErrorMessage(e);
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
+            json.put("error",errorMessage);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(json.toString());
+        } catch (Exception e) {
+            json.put("error",e.getMessage());
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(json.toString());
         }
-        catch (Exception e) {
-            return new ResponseEntity<>(authService.registerUser(authRegisterDTO), HttpStatus.OK);
+    }
+
+    @PostMapping("/register-er")
+    public ResponseEntity<Object> registerEr(@RequestBody AuthRegisterDTO authRegisterDTO) throws JSONException {
+        JSONObject json = new JSONObject();
+        try {
+            return new ResponseEntity<>(authService.registerEr(authRegisterDTO), HttpStatus.OK);
+        } catch (DataIntegrityViolationException e) {
+            String errorMessage = extractConstraintErrorMessage(e);
+            json.put("error",errorMessage);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(json.toString());
+        } catch (Exception e) {
+            json.put("error",e.getMessage());
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(json.toString());
         }
     }
 
@@ -46,7 +67,7 @@ public class AuthController {
         String constraintName = e.getCause().getMessage();
         String text = fetchConstraintColumn(constraintName, "Detail: Key ").split("=")[0].replaceAll("[()]", "");
         if (constraintName.contains("constraint ")) {
-            errorMessage = "The entered "+ text.split("=")[0] + " is already registered.";
+            errorMessage = "The entered " + text.split("=")[0] + " is already registered.";
         } else {
             errorMessage += "Unknown constraint";
         }
@@ -82,8 +103,12 @@ public class AuthController {
         try {
             System.out.println(authLoginDTO);
             return new ResponseEntity<>(authService.loginUser(authLoginDTO), HttpStatus.OK);
-        } catch (Exception e){
+        } catch (InvalidAttributeValueException e) {
             return new ResponseEntity<>(authResponse, HttpStatus.UNAUTHORIZED);
+        } catch(AccountNotFoundException e) {
+            return new ResponseEntity<>(authResponse, HttpStatus.NOT_FOUND);
+        } catch(Exception e) {
+            return new ResponseEntity<>(authResponse, HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
     }

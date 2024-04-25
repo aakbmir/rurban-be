@@ -11,17 +11,23 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class UserInfo {
+public class Clinic {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
 
-    @Column(unique=true)
-    private String email;
+    private String clinicName;
 
     @Column(unique=true)
-    private long contact;
+    private String clinicEmail;
 
-    private String password;
+    @Column(unique=true)
+    private long clinicContact;
+
+    private String clinicLocation;
+
+    private String clinicWebsite;
+
+
 }

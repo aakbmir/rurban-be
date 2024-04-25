@@ -10,11 +10,11 @@ import java.util.List;
 @Repository
 public interface UserInfoRepository extends CrudRepository<UserInfo, Long> {
 
-    @Query("select ui from UserInfo ui where ui.email = :email OR CAST(ui.phone AS string) = :email")
+    @Query("select ui from UserInfo ui where upper(ui.email) = upper(:email)")
     UserInfo findByEmailOrPhone(String email);
 
-    @Query("select ui from UserInfo ui where ui.registerType = :type")
-    List<UserInfo> fetchHospitals(String type);
+//    @Query("select ui from UserInfo ui where upper(ui.registerType) = upper(:type)")
+//    List<UserInfo> fetchClinics(String type);
 
 
 }
