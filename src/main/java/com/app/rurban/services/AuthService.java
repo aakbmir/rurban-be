@@ -91,37 +91,36 @@ public class AuthService {
     }
 
     public AuthResponseDTO loginUser(AuthLoginDTO authLoginDTO) throws InvalidAttributeValueException, AccountNotFoundException {
-        AuthResponseDTO authResponse = new AuthResponseDTO();
         UserInfo userInfo = userInfoRepository.findByEmailOrPhone(authLoginDTO.getUsername());
         if (userInfo != null) {
             if (userInfo.getPassword().equalsIgnoreCase(authLoginDTO.getPassword())) {
-                return loginDetails(userInfo.getEmail(), authResponse);
+                return loginDetails(userInfo.getEmail());
             } else {
-                authResponse.setMessage("Invalid Credentials");
-                throw new InvalidAttributeValueException(authResponse.getMessage());
+                throw new InvalidAttributeValueException("Invalid Credentials");
             }
         } else {
-            authResponse.setMessage("User does not exist");
-            throw new AccountNotFoundException(authResponse.getMessage());
+            throw new AccountNotFoundException("User does not exist");
         }
     }
 
-    private AuthResponseDTO loginDetails(String email, AuthResponseDTO authResponseDTO) {
+    private AuthResponseDTO loginDetails(String email) {
+        AuthResponseDTO authResponseDTO = new AuthResponseDTO();
 
-        String username = "";
         String registerType = "";
         Patient p = patientRepository.findByEmail(email);
         if (p == null) {
             Clinic c = clinicRepository.findByEmail(email);
             if (c != null) {
-                username = c.getClinicName();
+                authResponseDTO.getDetails().setId(c.getId());
+                authResponseDTO.getDetails().setName(c.getClinicName());
                 registerType = "Hospital";
             }
         } else {
-            username = p.getPatientName();
+            authResponseDTO.getDetails().setId(p.getId());
+            authResponseDTO.getDetails().setName(p.getPatientName());
             registerType = "Patient";
         }
-        authResponseDTO.setUsername(username);
+
         authResponseDTO.setMessage("Success");
         authResponseDTO.setRegisterType(registerType);
         return authResponseDTO;

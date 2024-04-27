@@ -19,15 +19,13 @@ public class Clinic {
 
     private String clinicName;
 
-    @Column(unique=true)
+    @Column(unique = true)
     private String clinicEmail;
 
-    @Column(unique=true)
+    @Column(unique = true)
     private long clinicContact;
 
     private String clinicLocation;
 
     private String clinicWebsite;
-
-
 }

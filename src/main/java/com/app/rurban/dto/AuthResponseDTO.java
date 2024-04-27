@@ -8,9 +8,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AuthResponseDTO {
-    private String username;
+    private DetailsDTO details = new DetailsDTO();
     private String message;
     private String token;
-
     private String registerType;
 }

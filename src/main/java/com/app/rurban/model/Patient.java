@@ -21,13 +21,11 @@ public class Patient {
 
     private String patientDob;
 
-    @Column(unique=true)
+    @Column(unique = true)
     private String patientEmail;
 
-    @Column(unique=true)
+    @Column(unique = true)
     private long patientContact;
 
     private String patientCurrentLocation;
-
-
 }
