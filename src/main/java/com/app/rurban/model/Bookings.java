@@ -37,4 +37,6 @@ public class Bookings {
 
     //confirmed, cancelled
     private String bookingStatus;
+
+    private String patient_location;
 }

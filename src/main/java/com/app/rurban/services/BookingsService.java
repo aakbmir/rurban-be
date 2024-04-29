@@ -39,21 +39,34 @@ public class BookingsService {
 
         Bookings bookings = new Bookings();
         bookings.setBookingDate(bookingsDTO.getBookingDate());
-                bookings.setBookingStatus(bookingsDTO.getBookingStatus());
-                bookings.setCheckedInStatus(bookingsDTO.getCheckedInStatus());
-                bookings.setClinicId(clinic);
-                bookings.setPatientId(patient);
-                bookings.setETA(bookingsDTO.getETA());
-                bookings.setBookingDate(new Date());
-                return bookingsRepository.save(bookings);
+        bookings.setBookingStatus(bookingsDTO.getBookingStatus());
+        bookings.setCheckedInStatus(bookingsDTO.getCheckedInStatus());
+        bookings.setClinicId(clinic);
+        bookings.setPatientId(patient);
+        bookings.setETA(bookingsDTO.getETA());
+        bookings.setBookingDate(new Date());
+        bookings.setPatient_location(bookingsDTO.getPosition());
+        return bookingsRepository.save(bookings);
 
     }
 
-
-    public List<Bookings> fetchBookings(Long userId) {
+    public List<Bookings> fetchPatientBookings(Long userId) {
         Patient patient = patientRepository.findById(Long.valueOf(userId))
                 .orElseThrow(() -> new RuntimeException("Patient not found"));
-        return bookingsRepository.findByPatientId(patient);
+        return bookingsRepository.findByPatientIdAndConfirmedStatus(patient);
+    }
 
+
+    public List<Bookings> fetchClinicBookings(Long clinicId) {
+        Clinic clinic = clinicRepository.findById(Long.valueOf(clinicId))
+                .orElseThrow(() -> new RuntimeException("Patient not found"));
+        return bookingsRepository.findByClinicId(clinic);
+
+    }
+    public Bookings cancelBooking(String id) {
+        Bookings booking = bookingsRepository.findById(Long.valueOf(id))
+                .orElseThrow(() -> new RuntimeException("Booking not found"));
+        booking.setBookingStatus("Cancelled");
+        return bookingsRepository.save(booking);
     }
 }

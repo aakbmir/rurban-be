@@ -42,11 +42,20 @@ public class DataController {
         }
     }
 
+    @DeleteMapping("/cancel-booking")
+    public ResponseEntity<Object> cancelBooking(@RequestParam String id) {
+        try {
+            Bookings bookingsObj = bookingsService.cancelBooking(id);
+            return new ResponseEntity<>(bookingsObj, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.OK);
+        }
+    }
 
     @GetMapping("/fetch-Bookings")
-    public ResponseEntity<Object> fetchBookings(@RequestParam String userId) {
+    public ResponseEntity<Object> fetchPatientBookings(@RequestParam String userId) {
         try {
-            List<Bookings> clinics = bookingsService.fetchBookings(Long.valueOf(userId));
+            List<Bookings> clinics = bookingsService.fetchPatientBookings(Long.valueOf(userId));
             return new ResponseEntity<>(clinics, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.OK);
@@ -64,11 +73,10 @@ public class DataController {
     }
 
     @GetMapping("/fetch-patients")
-    public ResponseEntity<Object> fetchPatients() {
+    public ResponseEntity<Object> fetchPatients(@RequestParam String clinicId) {
         try {
-            List<UserInfo> user = new ArrayList<>();
-            //List<UserInfo> user = authService.fetchPatients();
-            return new ResponseEntity<>(user, HttpStatus.OK);
+            List<Bookings> clinics = bookingsService.fetchClinicBookings(Long.valueOf(clinicId));
+            return new ResponseEntity<>(clinics, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.OK);
         }

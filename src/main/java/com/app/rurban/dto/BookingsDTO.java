@@ -21,4 +21,5 @@ public class BookingsDTO {
     private String ETA;
     private String checkedInStatus;
     private String bookingStatus;
+    private String position;
 }
