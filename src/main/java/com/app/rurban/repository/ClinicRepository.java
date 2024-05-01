@@ -14,4 +14,10 @@ public interface ClinicRepository extends CrudRepository<Clinic, Long> {
 
     @Query("select c from Clinic c where upper(c.clinicEmail) = upper(:email)")
     Clinic findByEmail(String email);
+
+    @Query("select c from Clinic c")
+    Clinic findByIdAndPastData(Long id);
+
+    @Query("select c from Clinic c")
+    Clinic findByIdAndUpcomingCheckins(Long id);
 }

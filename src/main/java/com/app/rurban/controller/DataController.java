@@ -1,18 +1,15 @@
 package com.app.rurban.controller;
 
-import com.app.rurban.dto.BookingsDTO;
-import com.app.rurban.model.Bookings;
+import com.app.rurban.dto.CheckInDTO;
+import com.app.rurban.model.CheckIns;
 import com.app.rurban.model.Clinic;
-import com.app.rurban.model.UserInfo;
-import com.app.rurban.services.AuthService;
-import com.app.rurban.services.BookingsService;
+import com.app.rurban.services.CheckInService;
 import com.app.rurban.services.DataService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -21,7 +18,7 @@ import java.util.List;
 public class DataController {
 
     @Autowired
-    BookingsService bookingsService;
+    CheckInService checkInService;
 
     @Autowired
     DataService dataService;
@@ -31,31 +28,31 @@ public class DataController {
         return "up and running";
     }
 
-    @PostMapping("/create-booking")
-    public ResponseEntity<Object> createBooking(@RequestBody BookingsDTO bookings) {
+    @PostMapping("/create-checkin")
+    public ResponseEntity<Object> createCheckIns(@RequestBody CheckInDTO checkInDTO) {
         try {
 
-            Bookings bookingsObj = bookingsService.createBooking(bookings);
-            return new ResponseEntity<>(bookingsObj, HttpStatus.OK);
+            CheckIns checkInsObj = checkInService.createCheckIns(checkInDTO);
+            return new ResponseEntity<>(checkInsObj, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.OK);
         }
     }
 
-    @DeleteMapping("/cancel-booking")
-    public ResponseEntity<Object> cancelBooking(@RequestParam String id) {
+    @DeleteMapping("/cancel-checkin")
+    public ResponseEntity<Object> cancelCheckIns(@RequestParam String id) {
         try {
-            Bookings bookingsObj = bookingsService.cancelBooking(id);
-            return new ResponseEntity<>(bookingsObj, HttpStatus.OK);
+            CheckIns checkInsObj = checkInService.cancelCheckIns(id);
+            return new ResponseEntity<>(checkInsObj, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.OK);
         }
     }
 
-    @GetMapping("/fetch-Bookings")
-    public ResponseEntity<Object> fetchPatientBookings(@RequestParam String userId) {
+    @GetMapping("/fetch-upcoming-appointments")
+    public ResponseEntity<Object> fetchUpcomingAppointments(@RequestParam String userId) {
         try {
-            List<Bookings> clinics = bookingsService.fetchPatientBookings(Long.valueOf(userId));
+            List<CheckIns> clinics = checkInService.fetchUpcomingAppointments(Long.valueOf(userId));
             return new ResponseEntity<>(clinics, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.OK);
@@ -72,10 +69,10 @@ public class DataController {
         }
     }
 
-    @GetMapping("/fetch-patients")
-    public ResponseEntity<Object> fetchPatients(@RequestParam String clinicId) {
+    @GetMapping("/fetch-past-appointments")
+    public ResponseEntity<Object> fetchPastAppointments(@RequestParam String clinicId) {
         try {
-            List<Bookings> clinics = bookingsService.fetchClinicBookings(Long.valueOf(clinicId));
+            List<CheckIns> clinics = checkInService.fetchPastAppointments(Long.valueOf(clinicId));
             return new ResponseEntity<>(clinics, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.OK);

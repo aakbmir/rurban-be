@@ -1,8 +1,5 @@
 package com.app.rurban.dto;
 
-import com.app.rurban.model.Clinic;
-import com.app.rurban.model.Patient;
-import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,12 +11,14 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class BookingsDTO {
+public class CheckInDTO {
     private String patientId;
     private String clinicId;
-    private Date bookingDate;
     private String ETA;
-    private String checkedInStatus;
+    private String checkInStatus;
+    private Date checkInDate;
     private String bookingStatus;
+    private Date bookingDate;
+    private Date cancellationDate;
     private String position;
 }

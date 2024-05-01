@@ -62,8 +62,6 @@ public class AuthController {
 
     private String extractConstraintErrorMessage(DataIntegrityViolationException e) {
         String errorMessage = "";
-
-        // Extract the specific constraint name from the exception message
         String constraintName = e.getCause().getMessage();
         String text = fetchConstraintColumn(constraintName, "Detail: Key ").split("=")[0].replaceAll("[()]", "");
         if (constraintName.contains("constraint ")) {
@@ -71,7 +69,6 @@ public class AuthController {
         } else {
             errorMessage += "Unknown constraint";
         }
-
         return errorMessage;
     }
 

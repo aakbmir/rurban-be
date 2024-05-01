@@ -13,7 +13,7 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Bookings {
+public class CheckIns {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -27,16 +27,19 @@ public class Bookings {
     @JoinColumn(name = "clinic_id")
     private Clinic clinicId;
 
+    // scheduled, checked-in, completed, no-show,
+    private String checkInStatus;
 
-    private Date bookingDate;
+    private Date checkInDate;
 
     private String ETA;
 
-    // scheduled, checked-in, in-progress, completed, no-show,
-    private String checkedInStatus;
-
-    //confirmed, cancelled
+    //booked, cancelled
     private String bookingStatus;
 
-    private String patient_location;
+    private Date bookingDate;
+
+    private Date bookingCancellationDate;
+
+    private String patientLocation;
 }

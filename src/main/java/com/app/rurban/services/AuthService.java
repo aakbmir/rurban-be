@@ -87,7 +87,7 @@ public class AuthService {
         auth.setClinicEmail(authRegisterDTO.getEmail());
         auth.setClinicContact(authRegisterDTO.getContact());
         auth.setClinicLocation(authRegisterDTO.getLocation());
-        auth.setClinicWebsite(authRegisterDTO.getLocation());
+        auth.setClinicWebsite(authRegisterDTO.getWebsite());
         return auth;
     }
 
