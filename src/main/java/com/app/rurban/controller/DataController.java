@@ -49,10 +49,10 @@ public class DataController {
         }
     }
 
-    @GetMapping("/fetch-upcoming-appointments")
-    public ResponseEntity<Object> fetchUpcomingAppointments(@RequestParam String userId) {
+    @GetMapping("/fetch-user-checkins")
+    public ResponseEntity<Object> fetchUserCheckins(@RequestParam String userId, @RequestParam String records) {
         try {
-            List<CheckIns> clinics = checkInService.fetchUpcomingAppointments(Long.valueOf(userId));
+            List<CheckIns> clinics = checkInService.fetchUserCheckins(Long.valueOf(userId), records);
             return new ResponseEntity<>(clinics, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.OK);
@@ -69,10 +69,10 @@ public class DataController {
         }
     }
 
-    @GetMapping("/fetch-past-appointments")
-    public ResponseEntity<Object> fetchPastAppointments(@RequestParam String clinicId) {
+    @GetMapping("/fetch-hospital-checkins")
+    public ResponseEntity<Object> fetchHospitalCheckins(@RequestParam String clinicId) {
         try {
-            List<CheckIns> clinics = checkInService.fetchPastAppointments(Long.valueOf(clinicId));
+            List<CheckIns> clinics = checkInService.fetchHospitalCheckins(Long.valueOf(clinicId));
             return new ResponseEntity<>(clinics, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.OK);

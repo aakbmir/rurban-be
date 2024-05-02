@@ -9,9 +9,12 @@ import com.app.rurban.repository.ClinicRepository;
 import com.app.rurban.repository.PatientRepository;
 import com.app.rurban.utils.CommonConstants;
 import com.app.rurban.utils.CommonUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -48,8 +51,8 @@ public class CheckInService {
 
             String api = "https://api.openrouteservice.org/v2/directions/driving-car?";
             String api_key = "api_key=" + CommonUtils.API_KEY;
-            String origin = "&start=" + checkInDTO.getPosition().split(",")[0] + "," + checkInDTO.getPosition().split(",")[1];
-            String destination = "&end=" + clinic.getClinicLocation().split(",")[0] + "," + clinic.getClinicLocation().split(",")[1];
+            String origin = "&start=" + checkInDTO.getPosition().split(",")[1] + "," + checkInDTO.getPosition().split(",")[0];
+            String destination = "&end=" + clinic.getClinicLocation().split(",")[1] + "," + clinic.getClinicLocation().split(",")[0];
             String url = api + api_key + origin + destination;
             HttpHeaders headers = new HttpHeaders();
 //            headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
@@ -60,25 +63,22 @@ public class CheckInService {
                 JSONObject geoResponse1 = new JSONObject(res);
                 JSONArray durations = geoResponse1.getJSONArray("durations");
                 Double duration = durations.getJSONArray(0).getDouble(0);
-            }catch (Exception e) {
+            } catch (Exception e) {
                 System.out.println();
             }
-            try {
-                JSONObject geoResponse = new JSONObject(res);
-                JSONArray features = geoResponse.getJSONArray("features");
-                JSONObject feature = features.getJSONObject(0);
-                JSONObject properties = feature.getJSONObject("properties");
-                JSONObject summary = properties.getJSONObject("summary");
-                Double duration = summary.getDouble("duration");
-                System.out.println(duration);
-            } catch(Exception e) {
-                System.out.println(e);
-            }
-            return "20 Mins";
+
+            JSONObject geoResponse = new JSONObject(res);
+            JSONArray features = geoResponse.getJSONArray("features");
+            JSONObject feature = features.getJSONObject(0);
+            JSONObject properties = feature.getJSONObject("properties");
+            JSONObject summary = properties.getJSONObject("summary");
+            int duration = Integer.valueOf((int) summary.getDouble("duration") / 60);
+
+            return String.valueOf(duration);
+
         } catch (Exception e) {
             return "NA";
         }
-
     }
 
     private CheckIns mapToCheckIns(CheckInDTO checkInDTO) {
@@ -96,19 +96,29 @@ public class CheckInService {
         checkIns.setPatientId(patient);
         checkIns.setPatientLocation(checkInDTO.getPosition());
         checkIns.setETA(calculateETA(clinic, checkInDTO));
+        Date currDate = new Date();
+        int minutesToAdd = Integer.valueOf(checkIns.getETA());
+        Date etaTime = DateUtils.addMinutes(currDate, minutesToAdd);
+        checkIns.setEstimatedAppointmentTime(etaTime);
         return checkInsRepository.save(checkIns);
 
     }
 
-    public List<CheckIns> fetchUpcomingAppointments(Long userId) {
+    public List<CheckIns> fetchUserCheckins(Long userId, String records) {
         Patient patient = patientRepository.findById(Long.valueOf(userId))
                 .orElseThrow(() -> new RuntimeException("Patient not found"));
-        return checkInsRepository.findByIdAndUpcomingCheckins(patient);
+        if (records.equalsIgnoreCase("all")) {
+            return checkInsRepository.findByIdAndAllCheckins(patient);
+        } else {
+            Pageable topThree = PageRequest.of(0, 1);
+            return checkInsRepository.findByIdAndUpcomingCheckins(patient, topThree);
+        }
     }
 
 
-    public List<CheckIns> fetchPastAppointments(Long clinicId) {
-        Clinic clinic = clinicRepository.findByIdAndPastData(Long.valueOf(clinicId));
+    public List<CheckIns> fetchHospitalCheckins(Long clinicId) {
+        Clinic clinic = clinicRepository.findById(Long.valueOf(clinicId))
+                .orElseThrow(() -> new RuntimeException("checkIn not found"));
         return checkInsRepository.findByClinicId(clinic);
 
     }

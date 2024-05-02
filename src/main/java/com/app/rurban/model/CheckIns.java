@@ -34,6 +34,8 @@ public class CheckIns {
 
     private String ETA;
 
+    private Date estimatedAppointmentTime;
+
     //booked, cancelled
     private String bookingStatus;
 
