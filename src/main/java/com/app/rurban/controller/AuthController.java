@@ -31,15 +31,18 @@ public class AuthController {
 
     @PostMapping("/register-user")
     public ResponseEntity<Object> registerUser(@RequestBody AuthRegisterDTO authRegisterDTO) throws JSONException {
+
         JSONObject json = new JSONObject();
         try {
-            System.out.println(authRegisterDTO);
+            System.out.println(authRegisterDTO.toString());
             return new ResponseEntity<>(authService.registerUser(authRegisterDTO), HttpStatus.OK);
         } catch (DataIntegrityViolationException e) {
             String errorMessage = extractConstraintErrorMessage(e);
             json.put("error",errorMessage);
+            System.out.println("error" + e);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(json.toString());
         } catch (Exception e) {
+            System.out.println("error" + e);
             json.put("error",e.getMessage());
             return ResponseEntity.status(HttpStatus.CONFLICT).body(json.toString());
         }
@@ -49,12 +52,15 @@ public class AuthController {
     public ResponseEntity<Object> registerEr(@RequestBody AuthRegisterDTO authRegisterDTO) throws JSONException {
         JSONObject json = new JSONObject();
         try {
+            System.out.println(authRegisterDTO.toString());
             return new ResponseEntity<>(authService.registerEr(authRegisterDTO), HttpStatus.OK);
         } catch (DataIntegrityViolationException e) {
+            System.out.println("error" + e);
             String errorMessage = extractConstraintErrorMessage(e);
             json.put("error",errorMessage);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(json.toString());
         } catch (Exception e) {
+            System.out.println("error" + e);
             json.put("error",e.getMessage());
             return ResponseEntity.status(HttpStatus.CONFLICT).body(json.toString());
         }
@@ -98,7 +104,7 @@ public class AuthController {
     public ResponseEntity<Object> getLogin(@RequestBody AuthLoginDTO authLoginDTO) {
         AuthResponseDTO authResponse = new AuthResponseDTO();
         try {
-            System.out.println(authLoginDTO);
+            System.out.println(authLoginDTO.toString());
             return new ResponseEntity<>(authService.loginUser(authLoginDTO), HttpStatus.OK);
         } catch (InvalidAttributeValueException e) {
             return new ResponseEntity<>(authResponse, HttpStatus.UNAUTHORIZED);
