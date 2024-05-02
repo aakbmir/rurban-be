@@ -74,8 +74,8 @@ public class AuthService {
         Patient auth = new Patient();
         auth.setPatientName(authRegisterDTO.getName());
         auth.setPatientDob(authRegisterDTO.getDob());
-        auth.setPatientEmail(authRegisterDTO.getName().replace(" ","").concat("@gmail.com"));
-//        auth.setPatientEmail(authRegisterDTO.getEmail());
+        //auth.setPatientEmail(authRegisterDTO.getName().replace(" ","").concat("@gmail.com"));
+        auth.setPatientEmail(authRegisterDTO.getEmail());
         auth.setPatientContact(authRegisterDTO.getContact());
         auth.setPatientCurrentLocation(authRegisterDTO.getLocation());
         return auth;
