@@ -40,7 +40,7 @@ public class AuthService {
         boolean isRegistered = verifyEmailOrPhoneAlreadyRegistered(authRegisterDTO.getEmail(), authRegisterDTO.getContact());
 
         if (isRegistered) {
-            throw new Exception("Email or Contact Already Registered!!");
+            throw new Exception("The email or contact you entered is already registered!!");
         }
         Patient savedPatient = patientRepository.save(convertModelToPatientEntity(authRegisterDTO));
         saveLoginCredentials(savedPatient.getPatientEmail(), authRegisterDTO.getPassword());
@@ -56,7 +56,7 @@ public class AuthService {
         boolean isRegistered = verifyEmailOrPhoneAlreadyRegistered(authRegisterDTO.getEmail(), authRegisterDTO.getContact());
 
         if (isRegistered) {
-            throw new Exception("Email or Contact Already Registered!!");
+            throw new Exception("The email or contact you entered is already registered!!");
         }
         Clinic savedClinic = clinicRepository.save(convertModelToErEntity(authRegisterDTO));
         saveLoginCredentials(savedClinic.getClinicEmail(), authRegisterDTO.getPassword());

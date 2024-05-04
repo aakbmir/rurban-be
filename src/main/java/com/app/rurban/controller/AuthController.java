@@ -40,11 +40,11 @@ public class AuthController {
             String errorMessage = extractConstraintErrorMessage(e);
             json.put("error",errorMessage);
             System.out.println("error" + e);
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(json.toString());
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(json.toString());
         } catch (Exception e) {
             System.out.println("error" + e);
             json.put("error",e.getMessage());
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(json.toString());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(json.toString());
         }
     }
 
@@ -58,11 +58,11 @@ public class AuthController {
             System.out.println("error" + e);
             String errorMessage = extractConstraintErrorMessage(e);
             json.put("error",errorMessage);
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(json.toString());
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(json.toString());
         } catch (Exception e) {
             System.out.println("error" + e);
             json.put("error",e.getMessage());
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(json.toString());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(json.toString());
         }
     }
 
