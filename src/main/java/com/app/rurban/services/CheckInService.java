@@ -58,7 +58,7 @@ public class CheckInService {
 //            headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
             HttpEntity<String> entity = new HttpEntity<String>(headers);
             String res = restTemplate.exchange(url, HttpMethod.GET, entity, String.class).getBody();
-            System.out.println(res);
+
             try {
                 JSONObject geoResponse1 = new JSONObject(res);
                 JSONArray durations = geoResponse1.getJSONArray("durations");
@@ -91,7 +91,6 @@ public class CheckInService {
         CheckIns checkIns = new CheckIns();
         checkIns.setBookingDate(new Date());
         checkIns.setBookingStatus(CommonConstants.BOOKED);
-        checkIns.setCheckInStatus(CommonConstants.CONFIRMED);
         checkIns.setClinicId(clinic);
         checkIns.setPatientId(patient);
         checkIns.setPatientLocation(checkInDTO.getPosition());
@@ -110,24 +109,40 @@ public class CheckInService {
         if (records.equalsIgnoreCase("all")) {
             return checkInsRepository.findByIdAndAllCheckins(patient);
         } else {
-            Pageable topThree = PageRequest.of(0, 1);
-            return checkInsRepository.findByIdAndUpcomingCheckins(patient, topThree);
+            return checkInsRepository.findByIdAndUpcomingCheckins(patient);
         }
     }
-
 
     public List<CheckIns> fetchHospitalCheckins(Long clinicId) {
         Clinic clinic = clinicRepository.findById(Long.valueOf(clinicId))
                 .orElseThrow(() -> new RuntimeException("checkIn not found"));
-        return checkInsRepository.findByClinicId(clinic);
-
+        return checkInsRepository.findUpcomingCheckinsByClinicId(clinic);
     }
 
+    public List<CheckIns> fetchPastHospitalCheckins(Long clinicId) {
+        Clinic clinic = clinicRepository.findById(Long.valueOf(clinicId))
+                .orElseThrow(() -> new RuntimeException("checkIn not found"));
+        return checkInsRepository.findPastCheckinsByClinicId(clinic);
+    }
     public CheckIns cancelCheckIns(String id) {
         CheckIns checkIn = checkInsRepository.findById(Long.valueOf(id))
                 .orElseThrow(() -> new RuntimeException("checkIn not found"));
         checkIn.setBookingStatus("Cancelled");
         checkIn.setBookingCancellationDate(new Date());
+        return checkInsRepository.save(checkIn);
+    }
+
+    public CheckIns clinicCheckinUpdate(String id, String action) {
+        CheckIns checkIn = checkInsRepository.findById(Long.valueOf(id))
+                .orElseThrow(() -> new RuntimeException("checkIn not found"));
+        if (action.equalsIgnoreCase("checkIn")) {
+            checkIn.setCheckInDate(new Date());
+            checkIn.setCheckInStatus("Checked In");
+        } else {
+            checkIn.setCheckInCancellationDate(new Date());
+            checkIn.setCheckInStatus("No Show");
+        }
+
         return checkInsRepository.save(checkIn);
     }
 }

@@ -32,6 +32,8 @@ public class CheckIns {
 
     private Date checkInDate;
 
+    private Date checkInCancellationDate;
+
     private String ETA;
 
     private Date estimatedAppointmentTime;

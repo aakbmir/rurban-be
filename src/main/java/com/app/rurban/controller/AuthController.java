@@ -34,7 +34,6 @@ public class AuthController {
 
         JSONObject json = new JSONObject();
         try {
-            System.out.println(authRegisterDTO.toString());
             return new ResponseEntity<>(authService.registerUser(authRegisterDTO), HttpStatus.OK);
         } catch (DataIntegrityViolationException e) {
             String errorMessage = extractConstraintErrorMessage(e);
@@ -52,7 +51,7 @@ public class AuthController {
     public ResponseEntity<Object> registerEr(@RequestBody AuthRegisterDTO authRegisterDTO) throws JSONException {
         JSONObject json = new JSONObject();
         try {
-            System.out.println(authRegisterDTO.toString());
+
             return new ResponseEntity<>(authService.registerEr(authRegisterDTO), HttpStatus.OK);
         } catch (DataIntegrityViolationException e) {
             System.out.println("error" + e);
@@ -104,7 +103,7 @@ public class AuthController {
     public ResponseEntity<Object> getLogin(@RequestBody AuthLoginDTO authLoginDTO) {
         AuthResponseDTO authResponse = new AuthResponseDTO();
         try {
-            System.out.println(authLoginDTO.toString());
+
             return new ResponseEntity<>(authService.loginUser(authLoginDTO), HttpStatus.OK);
         } catch (InvalidAttributeValueException e) {
             return new ResponseEntity<>(authResponse, HttpStatus.UNAUTHORIZED);
