@@ -38,11 +38,22 @@ public class CheckInService {
     @Autowired
     RestTemplate restTemplate;
 
-    public CheckIns createCheckIns(CheckInDTO checkInDTO) {
+    public CheckIns createCheckIns(CheckInDTO checkInDTO) throws Exception {
         CheckIns checkIns = mapToCheckIns(checkInDTO);
+        boolean isExistingCheckInPending = checkAlreadyExistingCheckIn(checkIns.getClinicId(), checkIns.getPatientId());
 
-
+        if (isExistingCheckInPending) {
+            throw new Exception("Existing Checkin Pending");
+        }
         return checkInsRepository.save(checkIns);
+    }
+
+    private boolean checkAlreadyExistingCheckIn(Clinic clinicId, Patient patientId) {
+        List<CheckIns> checkIns = checkInsRepository.fetchOpenCheckIns(clinicId, patientId);
+        if (!checkIns.isEmpty()) {
+            return true;
+        }
+        return false;
     }
 
     private String calculateETA(Clinic clinic, CheckInDTO checkInDTO) {
@@ -99,8 +110,7 @@ public class CheckInService {
         int minutesToAdd = Integer.valueOf(checkIns.getETA());
         Date etaTime = DateUtils.addMinutes(currDate, minutesToAdd);
         checkIns.setEstimatedAppointmentTime(etaTime);
-        return checkInsRepository.save(checkIns);
-
+        return checkIns;
     }
 
     public List<CheckIns> fetchUserCheckins(Long userId, String records) {
@@ -124,6 +134,7 @@ public class CheckInService {
                 .orElseThrow(() -> new RuntimeException("checkIn not found"));
         return checkInsRepository.findPastCheckinsByClinicId(clinic);
     }
+
     public CheckIns cancelCheckIns(String id) {
         CheckIns checkIn = checkInsRepository.findById(Long.valueOf(id))
                 .orElseThrow(() -> new RuntimeException("checkIn not found"));

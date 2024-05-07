@@ -36,6 +36,9 @@ public class DataController {
             CheckIns checkInsObj = checkInService.createCheckIns(checkInDTO);
             return new ResponseEntity<>(checkInsObj, HttpStatus.OK);
         } catch (Exception e) {
+            if (e.getMessage().equalsIgnoreCase("Existing Checkin Pending")) {
+                return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
+            }
             return new ResponseEntity<>(e.getMessage(), HttpStatus.OK);
         }
     }
