@@ -14,6 +14,7 @@ public class AuthRegisterDTO {
     private String email;
     private long contact;
     private String location;
+    private String address;
     private String website;
     private String registerType;
     private String password;

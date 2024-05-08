@@ -28,4 +28,6 @@ public class Clinic {
     private String clinicLocation;
 
     private String clinicWebsite;
+
+    private String clinicAddress;
 }

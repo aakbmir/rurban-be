@@ -88,7 +88,7 @@ public class CheckInService {
             return String.valueOf(duration);
 
         } catch (Exception e) {
-            return "NA";
+            return "0";
         }
     }
 
