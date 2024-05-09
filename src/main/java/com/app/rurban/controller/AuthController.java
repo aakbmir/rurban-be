@@ -54,7 +54,7 @@ public class AuthController {
 
         try {
             authService.verifyEmail(email, token);
-            headers.add(HttpHeaders.LOCATION, "https://rurban-fe.onrender.com/app/emailverified"); // Replace with your desired URL
+            headers.add(HttpHeaders.LOCATION, "https://rurban-fe.onrender.com/#/app/emailverified"); // Replace with your desired URL
         } catch(Exception e) {
             if(e.getMessage().equalsIgnoreCase("Already Verified")) {
                 headers.add(HttpHeaders.LOCATION, "https://rurban-fe.onrender.com/"); // Replace with your desired URL
