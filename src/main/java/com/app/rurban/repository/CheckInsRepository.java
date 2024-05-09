@@ -17,11 +17,12 @@ public interface CheckInsRepository extends CrudRepository<CheckIns, Long> {
     //@Query("select b from CheckIns b where b.patientId = :userId and b.appointmentStatus = 'Confirmed' order by checkInDate desc")
     List<CheckIns> findByPatientIdAndConfirmedStatus(Patient userId);
 
-    @Query("select b from CheckIns b where b.clinicId = :clinicId and b.checkInStatus is null order by bookingDate desc")
+    @Query("select b from CheckIns b where b.clinicId = :clinicId and b.checkInStatus is null and b.bookingStatus = 'Booked' order by bookingDate desc")
     List<CheckIns> findUpcomingCheckinsByClinicId(Clinic clinicId);
 
 
-    @Query("select b from CheckIns b where b.clinicId = :clinicId and b.checkInStatus is not null order by bookingDate desc")
+
+    @Query("select ci from CheckIns ci where ci.clinicId = :clinicId and (bookingStatus = 'Cancelled' or checkInStatus is not null or estimatedAppointmentTime < current_timestamp)")
     List<CheckIns> findPastCheckinsByClinicId(Clinic clinicId);
 
 
