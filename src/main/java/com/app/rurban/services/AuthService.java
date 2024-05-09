@@ -1,19 +1,32 @@
 package com.app.rurban.services;
 
+import com.app.rurban.RurbanApplication;
 import com.app.rurban.dto.AuthLoginDTO;
 import com.app.rurban.dto.AuthRegisterDTO;
 import com.app.rurban.dto.AuthResponseDTO;
+import com.app.rurban.model.CheckIns;
 import com.app.rurban.model.Clinic;
 import com.app.rurban.model.Patient;
 import com.app.rurban.model.UserInfo;
 import com.app.rurban.repository.ClinicRepository;
 import com.app.rurban.repository.PatientRepository;
 import com.app.rurban.repository.UserInfoRepository;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.event.EventListener;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.client.RestTemplate;
 
 import javax.management.InvalidAttributeValueException;
 import javax.security.auth.login.AccountNotFoundException;
+import java.util.UUID;
 
 @Service
 public class AuthService {
@@ -26,6 +39,9 @@ public class AuthService {
 
     @Autowired
     UserInfoRepository userInfoRepository;
+
+    @Autowired
+    EmailSenderService emailSenderService;
 
 //    public List<UserInfo> fetchClinics() {
 //        return userInfoRepository.fetchClinics("Clinics");
@@ -43,7 +59,8 @@ public class AuthService {
             throw new Exception("The email or contact you entered is already registered!!");
         }
         Patient savedPatient = patientRepository.save(convertModelToPatientEntity(authRegisterDTO));
-        saveLoginCredentials(savedPatient.getPatientEmail(), authRegisterDTO.getPassword());
+        UserInfo ui = saveLoginCredentials(savedPatient.getPatientEmail(), authRegisterDTO.getPassword());
+        sendEmail(ui.getEmail(), ui.getToken());
         return savedPatient;
     }
 
@@ -59,15 +76,28 @@ public class AuthService {
             throw new Exception("The email or contact you entered is already registered!!");
         }
         Clinic savedClinic = clinicRepository.save(convertModelToErEntity(authRegisterDTO));
-        saveLoginCredentials(savedClinic.getClinicEmail(), authRegisterDTO.getPassword());
+        UserInfo ui = saveLoginCredentials(savedClinic.getClinicEmail(), authRegisterDTO.getPassword());
+        sendEmail(ui.getEmail(), ui.getToken());
         return savedClinic;
     }
 
-    public void saveLoginCredentials(String email, String password) {
+
+    public void sendEmail( String toEmail, String token) {
+        try {
+            emailSenderService.sendMimeEmail(toEmail, "Confirm your Registration!", token);
+        } catch (Exception e) {
+            System.out.println("error while sending email");
+        }
+    }
+
+
+
+    public UserInfo saveLoginCredentials(String email, String password) {
         UserInfo userInfo = new UserInfo();
         userInfo.setEmail(email);
         userInfo.setPassword(password);
-        userInfoRepository.save(userInfo);
+        userInfo.setToken(String.valueOf(UUID.randomUUID()));
+        return userInfoRepository.save(userInfo);
     }
 
     private Patient convertModelToPatientEntity(AuthRegisterDTO authRegisterDTO) {
@@ -95,6 +125,9 @@ public class AuthService {
     public AuthResponseDTO loginUser(AuthLoginDTO authLoginDTO) throws InvalidAttributeValueException, AccountNotFoundException {
         UserInfo userInfo = userInfoRepository.findByEmailOrPhone(authLoginDTO.getUsername());
         if (userInfo != null) {
+            if(userInfo.getVerified() == null) {
+                throw new SecurityException("Email Not Verified");
+            }
             if (userInfo.getPassword().equalsIgnoreCase(authLoginDTO.getPassword())) {
                 return loginDetails(userInfo.getEmail());
             } else {
@@ -126,6 +159,21 @@ public class AuthService {
         authResponseDTO.setMessage("Success");
         authResponseDTO.setRegisterType(registerType);
         return authResponseDTO;
+    }
+
+    public String verifyEmail(String email, String token) throws Exception {
+        UserInfo userInfo = userInfoRepository.findByEmailOrPhone(email);
+        if(userInfo.getVerified() != null) {
+            throw new Exception("Already Verified");
+        } else {
+            if(userInfo.getToken().equalsIgnoreCase(token)) {
+                userInfo.setVerified("Verified");
+                userInfoRepository.save(userInfo);
+                return "success";
+            } else {
+                throw new Exception("Invalid Token");
+            }
+        }
     }
 
     //    private AuthResponseDTO generateJwtToken(String username, UserInfo userInfo, AuthResponseDTO authResponse) {

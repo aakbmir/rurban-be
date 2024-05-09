@@ -21,4 +21,8 @@ public class UserInfo {
     private String email;
 
     private String password;
+
+    private String verified;
+
+    private String token;
 }
