@@ -31,7 +31,7 @@ public class EmailSenderService {
             helper.setFrom("aakbmir@gmail.com");
             helper.setTo(toEmail);
             helper.setSubject(subject);
-            String emailLink = "https://rurban.onrender.com/api/v1/auth/verifyEmail?email=" + toEmail + "&token=" + token;
+            String emailLink = "https://rurban-be.onrender.com/api/v1/auth/verifyEmail?email=" + toEmail + "&token=" + token;
             String htmlContent = "<div style='margin: auto; text-align: center;'>" +
                     "<img alt='rurban' src='https://rurban-fe.onrender.com/7.png' />" +
                     "<p></p>" +
