@@ -25,8 +25,9 @@ public class DataController {
     DataService dataService;
 
     @GetMapping("/status")
-    public String getStatus() {
-        return "up and running";
+    public ResponseEntity<Object> getStatus() {
+        return new ResponseEntity<>(dataService.getCurrentLoc(), HttpStatus.OK);
+
     }
 
     @PostMapping("/create-checkin")

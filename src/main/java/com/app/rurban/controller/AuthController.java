@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.management.InvalidAttributeValueException;
 import javax.security.auth.login.AccountNotFoundException;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("api/v1/auth")
@@ -57,14 +58,27 @@ public class AuthController {
             headers.add(HttpHeaders.LOCATION, "https://rurban-fe.onrender.com/#/app/emailverified"); // Replace with your desired URL
         } catch(Exception e) {
             if(e.getMessage().equalsIgnoreCase("Already Verified")) {
-                headers.add(HttpHeaders.LOCATION, "https://rurban-fe.onrender.com/"); // Replace with your desired URL
+                headers.add(HttpHeaders.LOCATION, "https://rurban-fe.onrender.com/#/app/verifiedAccount"); // Replace with your desired URL
             } else if(e.getMessage().equalsIgnoreCase("Invalid Token")) {
                 headers.add(HttpHeaders.LOCATION, "https://rurban-fe.onrender.com/"); // Replace with your desired URL
             } else {
-                headers.add(HttpHeaders.LOCATION, "https://rurban-fe.onrender.com/"); // Replace with your desired URL
+                headers.add(HttpHeaders.LOCATION, "https://rurban-fe.onrender.com/#/app/verificationFailed"); // Replace with your desired URL
             }
         }
         return new ResponseEntity<>(headers, HttpStatus.FOUND);
+    }
+
+    @GetMapping("/resendVerificationEmail")
+    public ResponseEntity<String> resendVerificationEmail(@RequestParam String email) {
+        try {
+            String token = String.valueOf(UUID.randomUUID());
+            authService.sendEmail(email, token);
+            return new ResponseEntity<>("resend token", HttpStatus.FOUND);
+        } catch(Exception e) {
+            System.out.println("error email");
+            return new ResponseEntity<>("error email", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
     }
 
     @PostMapping("/register-er")

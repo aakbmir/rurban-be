@@ -84,6 +84,9 @@ public class AuthService {
 
     public void sendEmail( String toEmail, String token) {
         try {
+            UserInfo ui = userInfoRepository.findByEmailOrPhone(toEmail);
+            ui.setToken(token);
+            userInfoRepository.save(ui);
             emailSenderService.sendMimeEmail(toEmail, "Confirm your Registration!", token);
         } catch (Exception e) {
             System.out.println("error while sending email");

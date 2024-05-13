@@ -29,6 +29,11 @@ public class DataService {
         return (List<Clinic>) clinicRepository.findAll();
     }
 
+    public String getCurrentLoc() {
+        Patient c = patientRepository.findByEmail("aakbmir@gmail.com");
+        return c.getPatientCurrentLocation();
+    }
+
 //    public List<UserInfo> fetchPatients() {
 //        return userInfoRepository.fetchClinics("Patient");
 //    }
