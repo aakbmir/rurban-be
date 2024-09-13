@@ -4,7 +4,6 @@ import com.app.rurban.dto.AuthLoginDTO;
 import com.app.rurban.dto.AuthRegisterDTO;
 import com.app.rurban.dto.AuthResponseDTO;
 import com.app.rurban.services.AuthService;
-import com.fasterxml.jackson.databind.util.JSONPObject;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,12 +38,12 @@ public class AuthController {
             return new ResponseEntity<>(authService.registerUser(authRegisterDTO), HttpStatus.OK);
         } catch (DataIntegrityViolationException e) {
             String errorMessage = extractConstraintErrorMessage(e);
-            json.put("error",errorMessage);
+            json.put("error", errorMessage);
             System.out.println("error" + e);
             return ResponseEntity.status(HttpStatus.CONFLICT).body(json.toString());
         } catch (Exception e) {
             System.out.println("error" + e);
-            json.put("error",e.getMessage());
+            json.put("error", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(json.toString());
         }
     }
@@ -56,10 +55,10 @@ public class AuthController {
         try {
             authService.verifyEmail(email, token);
             headers.add(HttpHeaders.LOCATION, "https://rurban-fe.onrender.com/#/app/emailverified"); // Replace with your desired URL
-        } catch(Exception e) {
-            if(e.getMessage().equalsIgnoreCase("Already Verified")) {
+        } catch (Exception e) {
+            if (e.getMessage().equalsIgnoreCase("Already Verified")) {
                 headers.add(HttpHeaders.LOCATION, "https://rurban-fe.onrender.com/#/app/verifiedAccount"); // Replace with your desired URL
-            } else if(e.getMessage().equalsIgnoreCase("Invalid Token")) {
+            } else if (e.getMessage().equalsIgnoreCase("Invalid Token")) {
                 headers.add(HttpHeaders.LOCATION, "https://rurban-fe.onrender.com/"); // Replace with your desired URL
             } else {
                 headers.add(HttpHeaders.LOCATION, "https://rurban-fe.onrender.com/#/app/verificationFailed"); // Replace with your desired URL
@@ -74,7 +73,7 @@ public class AuthController {
             String token = String.valueOf(UUID.randomUUID());
             authService.sendEmail(email, token);
             return new ResponseEntity<>("resend token", HttpStatus.FOUND);
-        } catch(Exception e) {
+        } catch (Exception e) {
             System.out.println("error email");
             return new ResponseEntity<>("error email", HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -90,11 +89,11 @@ public class AuthController {
         } catch (DataIntegrityViolationException e) {
             System.out.println("error" + e);
             String errorMessage = extractConstraintErrorMessage(e);
-            json.put("error",errorMessage);
+            json.put("error", errorMessage);
             return ResponseEntity.status(HttpStatus.CONFLICT).body(json.toString());
         } catch (Exception e) {
             System.out.println("error" + e);
-            json.put("error",e.getMessage());
+            json.put("error", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(json.toString());
         }
     }
@@ -139,14 +138,13 @@ public class AuthController {
         try {
 
             return new ResponseEntity<>(authService.loginUser(authLoginDTO), HttpStatus.OK);
-        }
-        catch(SecurityException e) {
+        } catch (SecurityException e) {
             return new ResponseEntity<>(authResponse, HttpStatus.FORBIDDEN);
         } catch (InvalidAttributeValueException e) {
             return new ResponseEntity<>(authResponse, HttpStatus.UNAUTHORIZED);
-        } catch(AccountNotFoundException e) {
+        } catch (AccountNotFoundException e) {
             return new ResponseEntity<>(authResponse, HttpStatus.NOT_FOUND);
-        } catch(Exception e) {
+        } catch (Exception e) {
             return new ResponseEntity<>(authResponse, HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
