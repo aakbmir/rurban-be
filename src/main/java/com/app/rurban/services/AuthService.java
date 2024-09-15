@@ -43,6 +43,9 @@ public class AuthService {
     @Autowired
     EmailSenderService emailSenderService;
 
+    @Autowired
+    JwtService jwtService;
+
 //    public List<UserInfo> fetchClinics() {
 //        return userInfoRepository.fetchClinics("Clinics");
 //    }
@@ -82,7 +85,7 @@ public class AuthService {
     }
 
 
-    public void sendEmail( String toEmail, String token) {
+    public void sendEmail(String toEmail, String token) {
         try {
             UserInfo ui = userInfoRepository.findByEmailOrPhone(toEmail);
             ui.setToken(token);
@@ -92,7 +95,6 @@ public class AuthService {
             System.out.println("error while sending email");
         }
     }
-
 
 
     public UserInfo saveLoginCredentials(String email, String password) {
@@ -128,11 +130,12 @@ public class AuthService {
     public AuthResponseDTO loginUser(AuthLoginDTO authLoginDTO) throws InvalidAttributeValueException, AccountNotFoundException {
         UserInfo userInfo = userInfoRepository.findByEmailOrPhone(authLoginDTO.getUsername());
         if (userInfo != null) {
-            if(userInfo.getVerified() == null) {
+            if (userInfo.getVerified() == null) {
                 throw new SecurityException("Email Not Verified");
             }
             if (userInfo.getPassword().equalsIgnoreCase(authLoginDTO.getPassword())) {
-                return loginDetails(userInfo.getEmail());
+                return generateJwtToken(userInfo.getEmail());
+
             } else {
                 throw new InvalidAttributeValueException("Invalid Credentials");
             }
@@ -141,7 +144,7 @@ public class AuthService {
         }
     }
 
-    private AuthResponseDTO loginDetails(String email) {
+    private AuthResponseDTO generateJwtToken(String email) {
         AuthResponseDTO authResponseDTO = new AuthResponseDTO();
 
         String registerType = "";
@@ -158,7 +161,7 @@ public class AuthService {
             authResponseDTO.getDetails().setName(p.getPatientName());
             registerType = "Patient";
         }
-
+        authResponseDTO.setToken(jwtService.generateToken(email));
         authResponseDTO.setMessage("Success");
         authResponseDTO.setRegisterType(registerType);
         return authResponseDTO;
@@ -166,10 +169,10 @@ public class AuthService {
 
     public String verifyEmail(String email, String token) throws Exception {
         UserInfo userInfo = userInfoRepository.findByEmailOrPhone(email);
-        if(userInfo.getVerified() != null) {
+        if (userInfo.getVerified() != null) {
             throw new Exception("Already Verified");
         } else {
-            if(userInfo.getToken().equalsIgnoreCase(token)) {
+            if (userInfo.getToken().equalsIgnoreCase(token)) {
                 userInfo.setVerified("Verified");
                 userInfoRepository.save(userInfo);
                 return "success";
@@ -178,17 +181,4 @@ public class AuthService {
             }
         }
     }
-
-    //    private AuthResponseDTO generateJwtToken(String username, UserInfo userInfo, AuthResponseDTO authResponse) {
-//        String token = "";
-//        try {
-//            token = CommonUtils.lastToken.get(username);
-//            //jwtService.extractExpiration(token);
-//            authResponse.setRegisterType(userInfo.getRegisterType());
-//            return loginDetails(token, userInfo, username, authResponse);
-//        } catch (Exception e) {
-//            //token = jwtService.generateToken(username);
-//            return loginDetails(token, userInfo, username, authResponse);
-//        }
-//    }
 }
