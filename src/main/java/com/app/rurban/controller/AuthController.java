@@ -71,7 +71,7 @@ public class AuthController {
     public ResponseEntity<String> resendVerificationEmail(@RequestParam String email) {
         try {
             String token = String.valueOf(UUID.randomUUID());
-            authService.sendEmail(email, token);
+            authService.sendEmail("user", email, token);
             return new ResponseEntity<>("resend token", HttpStatus.FOUND);
         } catch (Exception e) {
             System.out.println("error email");

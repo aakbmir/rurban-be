@@ -1,0 +1,50 @@
+#server:
+#  port: 443
+#  ssl:
+#    key-store: classpath:rurban.p12
+#    key-store-password: password
+#    key-store-type: pkcs12
+#    key-alias: rurban
+#    key-password: password
+#    enabled: true
+#
+#spring:
+#  application:
+#    name: rurban
+#  datasource:
+#    url: jdbc:postgresql://dpg-crsekb0gph6c738slj70-a.oregon-postgres.render.com/rurban_scan
+#    username: rurban_scan_user
+#    password: DH5WWFRxIHlD31Pb7WWjOEOBkOhE7n97
+#    driver-class-name: org.postgresql.Driver
+#
+## Hibernate Configuration
+#  jpa:
+#    properties:
+#      hibernate:
+#        dialect: org.hibernate.dialect.PostgreSQLDialect
+#        ddl-auto: update
+#
+#  mail:
+#    host: smtp.gmail.com
+#    port: 587
+#    username: rurbanorg@gmail.com
+#    password: sdrpzmkwmoceygqu
+#  properties:
+#    mail:
+#      smtp:
+#        auth: true
+#        starttls:
+#          enable: true
+#openroute:
+#  service:
+#    api:
+#      key: 5b3ce3597851110001cf62485841300cbc6947e0ae08e8fa3c83c194
+#      endpoint: https://api.openrouteservice.org/v2/
+#      profile: driving-car
+#
+#springfox:
+#  documentation:
+#    swagger-ui:
+#      enabled: true
+#
+#

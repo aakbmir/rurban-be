@@ -30,7 +30,7 @@ public class DataService {
     }
 
     public String getCurrentLoc() {
-        Patient c = patientRepository.findByEmail("aakbmir@gmail.com");
+        Patient c = patientRepository.findByEmail("rurbanorg@gmail.com");
         return c.getPatientCurrentLocation();
     }
 

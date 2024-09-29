@@ -22,12 +22,12 @@ public class SpringFoxConfig {
     @Bean
     public OpenAPI springShopOpenAPI() {
         return new OpenAPI()
-                .info(new Info().title("Spring Boot 3 API")
-                        .description("Sample API documentation")
-                        .version("v1.0.0")
+                .info(new Info().title("Rurban API")
+                        .description("Rurban Health App documentation")
+                        .version("1.0")
                         .license(new License().name("Apache 2.0").url("http://springdoc.org")))
                 .externalDocs(new ExternalDocumentation()
-                        .description("SpringDoc OpenAPI Documentation")
+                        .description("Rurban OpenAPI Documentation")
                         .url("https://springdoc.org/"));
     }
 }

@@ -63,7 +63,7 @@ public class AuthService {
         }
         Patient savedPatient = patientRepository.save(convertModelToPatientEntity(authRegisterDTO));
         UserInfo ui = saveLoginCredentials(savedPatient.getPatientEmail(), authRegisterDTO.getPassword());
-        sendEmail(ui.getEmail(), ui.getToken());
+        sendEmail(savedPatient.getPatientName(), ui.getEmail(), ui.getToken());
         return savedPatient;
     }
 
@@ -80,17 +80,17 @@ public class AuthService {
         }
         Clinic savedClinic = clinicRepository.save(convertModelToErEntity(authRegisterDTO));
         UserInfo ui = saveLoginCredentials(savedClinic.getClinicEmail(), authRegisterDTO.getPassword());
-        sendEmail(ui.getEmail(), ui.getToken());
+        sendEmail(savedClinic.getClinicName(), ui.getEmail(), ui.getToken());
         return savedClinic;
     }
 
 
-    public void sendEmail(String toEmail, String token) {
+    public void sendEmail(String name, String toEmail, String token) {
         try {
             UserInfo ui = userInfoRepository.findByEmailOrPhone(toEmail);
             ui.setToken(token);
             userInfoRepository.save(ui);
-            emailSenderService.sendMimeEmail(toEmail, "Confirm your Registration!", token);
+            emailSenderService.sendMimeEmail(name, toEmail, "Confirm your Registration!", token);
         } catch (Exception e) {
             System.out.println("error while sending email");
         }
