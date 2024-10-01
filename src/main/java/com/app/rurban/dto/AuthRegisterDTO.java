@@ -1,13 +1,14 @@
 package com.app.rurban.dto;
 
-import jakarta.persistence.Column;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 @Getter
 @Setter
 @NoArgsConstructor
+@ToString
 public class AuthRegisterDTO {
     private String name;
     private String dob;

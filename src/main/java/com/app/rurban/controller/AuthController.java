@@ -4,6 +4,8 @@ import com.app.rurban.dto.AuthLoginDTO;
 import com.app.rurban.dto.AuthRegisterDTO;
 import com.app.rurban.dto.AuthResponseDTO;
 import com.app.rurban.services.AuthService;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +24,8 @@ import java.util.UUID;
 @CrossOrigin("*")
 public class AuthController {
 
+    private static final Logger logger = LogManager.getLogger(AuthController.class);
+
     @Autowired
     AuthService authService;
 
@@ -33,6 +37,7 @@ public class AuthController {
     @PostMapping("/register-user")
     public ResponseEntity<Object> registerUser(@RequestBody AuthRegisterDTO authRegisterDTO) throws JSONException {
 
+        logger.info("register-user : {}", authRegisterDTO.toString());
         JSONObject json = new JSONObject();
         try {
             return new ResponseEntity<>(authService.registerUser(authRegisterDTO), HttpStatus.OK);
@@ -51,7 +56,7 @@ public class AuthController {
     @GetMapping("/verifyEmail")
     public ResponseEntity<Void> verifyEmail(@RequestParam String email, @RequestParam String token) {
         HttpHeaders headers = new HttpHeaders();
-
+        logger.info("verifyEmail : {}", email);
         try {
             authService.verifyEmail(email, token);
             headers.add(HttpHeaders.LOCATION, "https://rurban-fe.onrender.com/#/app/emailverified"); // Replace with your desired URL
@@ -84,7 +89,7 @@ public class AuthController {
     public ResponseEntity<Object> registerEr(@RequestBody AuthRegisterDTO authRegisterDTO) throws JSONException {
         JSONObject json = new JSONObject();
         try {
-
+            logger.info("registerEr : {}", authRegisterDTO.toString());
             return new ResponseEntity<>(authService.registerEr(authRegisterDTO), HttpStatus.OK);
         } catch (DataIntegrityViolationException e) {
             System.out.println("error" + e);
@@ -135,6 +140,7 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<Object> getLogin(@RequestBody AuthLoginDTO authLoginDTO) {
         AuthResponseDTO authResponse = new AuthResponseDTO();
+        logger.info("getLogin : {}", authLoginDTO.toString());
         try {
 
             return new ResponseEntity<>(authService.loginUser(authLoginDTO), HttpStatus.OK);
