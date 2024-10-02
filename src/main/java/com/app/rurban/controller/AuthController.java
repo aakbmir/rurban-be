@@ -114,7 +114,6 @@ public class AuthController {
             responseDTO.setSuccess(false);
             responseDTO.setError("Failed to register");
             responseDTO.setMessage(errorMessage);
-
             return ResponseEntity.status(HttpStatus.CONFLICT).body(responseDTO.toString());
         } catch (Exception e) {
             System.out.println("error" + e);

@@ -1,6 +1,7 @@
 package com.app.rurban.controller;
 
 import com.app.rurban.dto.CheckInDTO;
+import com.app.rurban.dto.ResponseDTO;
 import com.app.rurban.model.CheckIns;
 import com.app.rurban.model.Clinic;
 import com.app.rurban.services.CheckInService;
@@ -31,18 +32,21 @@ public class DataController {
     @GetMapping("/status")
     public ResponseEntity<Object> getStatus() {
         return new ResponseEntity<>(dataService.getCurrentLoc(), HttpStatus.OK);
-
     }
 
     @PostMapping("/create-checkin")
     public ResponseEntity<Object> createCheckIns(@RequestBody CheckInDTO checkInDTO) {
+        ResponseDTO responseDTO = new ResponseDTO();
         try {
-
+            responseDTO.setSuccess(true);
             CheckIns checkInsObj = checkInService.createCheckIns(checkInDTO);
-            return new ResponseEntity<>(checkInsObj, HttpStatus.OK);
+            responseDTO.setData(checkInsObj);
+            return new ResponseEntity<>(responseDTO, HttpStatus.OK);
         } catch (Exception e) {
+            responseDTO.setSuccess(false);
+            responseDTO.setMessage(e.getMessage());
             if (e.getMessage().equalsIgnoreCase("Existing Checkin Pending")) {
-                return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
+                return new ResponseEntity<>(responseDTO, HttpStatus.CONFLICT);
             }
             return new ResponseEntity<>(e.getMessage(), HttpStatus.OK);
         }
@@ -50,62 +54,90 @@ public class DataController {
 
     @DeleteMapping("/cancel-checkin")
     public ResponseEntity<Object> cancelCheckIns(@RequestParam String id) {
+        ResponseDTO responseDTO = new ResponseDTO();
         try {
+            responseDTO.setSuccess(true);
             CheckIns checkInsObj = checkInService.cancelCheckIns(id);
-            return new ResponseEntity<>(checkInsObj, HttpStatus.OK);
+            responseDTO.setData(checkInsObj);
+            return new ResponseEntity<>(responseDTO, HttpStatus.OK);
         } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.OK);
+            responseDTO.setSuccess(false);
+            responseDTO.setMessage(e.getMessage());
+            return new ResponseEntity<>(responseDTO, HttpStatus.OK);
         }
     }
 
     @GetMapping("/fetch-user-checkins")
     public ResponseEntity<Object> fetchUserCheckins(@RequestParam String userId, @RequestParam String records) {
+        ResponseDTO responseDTO = new ResponseDTO();
         try {
+            responseDTO.setSuccess(true);
             List<CheckIns> clinics = checkInService.fetchUserCheckins(Long.valueOf(userId), records);
-            return new ResponseEntity<>(clinics, HttpStatus.OK);
+            responseDTO.setData(clinics);
+            return new ResponseEntity<>(responseDTO, HttpStatus.OK);
         } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.OK);
+            responseDTO.setSuccess(false);
+            responseDTO.setMessage(e.getMessage());
+            return new ResponseEntity<>(responseDTO, HttpStatus.OK);
         }
     }
 
     @GetMapping("/fetch-clinics")
     public ResponseEntity<Object> fetchClinics() {
+        ResponseDTO responseDTO = new ResponseDTO();
         try {
+            responseDTO.setSuccess(true);
             List<Clinic> clinics = dataService.fetchClinics();
-            return new ResponseEntity<>(clinics, HttpStatus.OK);
+            responseDTO.setData(clinics);
+            return new ResponseEntity<>(responseDTO, HttpStatus.OK);
         } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.OK);
+            responseDTO.setSuccess(false);
+            responseDTO.setMessage(e.getMessage());
+            return new ResponseEntity<>(responseDTO, HttpStatus.OK);
         }
     }
 
     @GetMapping("/fetch-hospital-checkins")
     public ResponseEntity<Object> fetchHospitalCheckins(@RequestParam String clinicId) {
+        ResponseDTO responseDTO = new ResponseDTO();
         try {
+            responseDTO.setSuccess(true);
             List<CheckIns> clinics = checkInService.fetchHospitalCheckins(Long.valueOf(clinicId));
-            return new ResponseEntity<>(clinics, HttpStatus.OK);
+            responseDTO.setData(clinics);
+            return new ResponseEntity<>(responseDTO, HttpStatus.OK);
         } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.OK);
+            responseDTO.setSuccess(false);
+            responseDTO.setMessage(e.getMessage());
+            return new ResponseEntity<>(responseDTO, HttpStatus.OK);
         }
     }
 
 
     @GetMapping("/fetch-past-hospital-checkins")
     public ResponseEntity<Object> fetchPastHospitalCheckins(@RequestParam String clinicId) {
+        ResponseDTO responseDTO = new ResponseDTO();
         try {
+            responseDTO.setSuccess(true);
             List<CheckIns> clinics = checkInService.fetchPastHospitalCheckins(Long.valueOf(clinicId));
-            return new ResponseEntity<>(clinics, HttpStatus.OK);
+            responseDTO.setData(clinics);
+            return new ResponseEntity<>(responseDTO, HttpStatus.OK);
         } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.OK);
+            responseDTO.setSuccess(false);
+            responseDTO.setMessage(e.getMessage());
+            return new ResponseEntity<>(responseDTO, HttpStatus.OK);
         }
     }
 
     @PostMapping("/clinic-checkin-update")
     public ResponseEntity<Object> clinicCheckinUpdate(@RequestBody String input) {
+        ResponseDTO responseDTO = new ResponseDTO();
         try {
+            responseDTO.setSuccess(true);
 
             JSONObject json = new JSONObject(input);
             CheckIns clinics = checkInService.clinicCheckinUpdate(json.getString("id"), json.getString("action"));
-            return new ResponseEntity<>(clinics, HttpStatus.OK);
+            responseDTO.setData(clinics);
+            return new ResponseEntity<>(responseDTO, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.OK);
         }
