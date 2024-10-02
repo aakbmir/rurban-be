@@ -3,6 +3,7 @@ package com.app.rurban.controller;
 import com.app.rurban.dto.AuthLoginDTO;
 import com.app.rurban.dto.AuthRegisterDTO;
 import com.app.rurban.dto.AuthResponseDTO;
+import com.app.rurban.dto.ResponseDTO;
 import com.app.rurban.services.AuthService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -38,18 +39,30 @@ public class AuthController {
     public ResponseEntity<Object> registerUser(@RequestBody AuthRegisterDTO authRegisterDTO) throws JSONException {
 
         logger.info("register-user : {}", authRegisterDTO.toString());
-        JSONObject json = new JSONObject();
+
+
+        ResponseDTO responseDTO = new ResponseDTO();
         try {
-            return new ResponseEntity<>(authService.registerUser(authRegisterDTO), HttpStatus.OK);
+            logger.info("registerEr : {}", authRegisterDTO.toString());
+            responseDTO.setSuccess(true);
+            responseDTO.setError(null);
+            responseDTO.setMessage("User successfully Registered");
+            responseDTO.setData(authService.registerUser(authRegisterDTO));
+            return new ResponseEntity<>(responseDTO, HttpStatus.OK);
         } catch (DataIntegrityViolationException e) {
-            String errorMessage = extractConstraintErrorMessage(e);
-            json.put("error", errorMessage);
             System.out.println("error" + e);
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(json.toString());
+            String errorMessage = extractConstraintErrorMessage(e);
+            responseDTO.setSuccess(false);
+            responseDTO.setError("Failed to register");
+            responseDTO.setMessage(errorMessage);
+
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(responseDTO);
         } catch (Exception e) {
             System.out.println("error" + e);
-            json.put("error", e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(json.toString());
+            responseDTO.setSuccess(false);
+            responseDTO.setError("Failed to register");
+            responseDTO.setMessage(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseDTO);
         }
     }
 
@@ -87,19 +100,28 @@ public class AuthController {
 
     @PostMapping("/register-er")
     public ResponseEntity<Object> registerEr(@RequestBody AuthRegisterDTO authRegisterDTO) throws JSONException {
-        JSONObject json = new JSONObject();
+        ResponseDTO responseDTO = new ResponseDTO();
         try {
             logger.info("registerEr : {}", authRegisterDTO.toString());
-            return new ResponseEntity<>(authService.registerEr(authRegisterDTO), HttpStatus.OK);
+            responseDTO.setSuccess(true);
+            responseDTO.setError(null);
+            responseDTO.setMessage("User successfully Registered");
+            responseDTO.setData(authService.registerEr(authRegisterDTO));
+            return new ResponseEntity<>(responseDTO, HttpStatus.OK);
         } catch (DataIntegrityViolationException e) {
             System.out.println("error" + e);
             String errorMessage = extractConstraintErrorMessage(e);
-            json.put("error", errorMessage);
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(json.toString());
+            responseDTO.setSuccess(false);
+            responseDTO.setError("Failed to register");
+            responseDTO.setMessage(errorMessage);
+
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(responseDTO.toString());
         } catch (Exception e) {
             System.out.println("error" + e);
-            json.put("error", e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(json.toString());
+            responseDTO.setSuccess(false);
+            responseDTO.setError("Failed to register");
+            responseDTO.setMessage(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseDTO.toString());
         }
     }
 
@@ -140,19 +162,30 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<Object> getLogin(@RequestBody AuthLoginDTO authLoginDTO) {
         AuthResponseDTO authResponse = new AuthResponseDTO();
+        ResponseDTO responseDTO = new ResponseDTO();
         logger.info("getLogin : {}", authLoginDTO.toString());
         try {
-
             return new ResponseEntity<>(authService.loginUser(authLoginDTO), HttpStatus.OK);
         } catch (SecurityException e) {
-            return new ResponseEntity<>(authResponse, HttpStatus.FORBIDDEN);
+            responseDTO = generateResponse(e.getMessage());
+            return new ResponseEntity<>(responseDTO, HttpStatus.FORBIDDEN);
         } catch (InvalidAttributeValueException e) {
-            return new ResponseEntity<>(authResponse, HttpStatus.UNAUTHORIZED);
+            responseDTO = generateResponse(e.getMessage());
+            return new ResponseEntity<>(responseDTO, HttpStatus.UNAUTHORIZED);
         } catch (AccountNotFoundException e) {
-            return new ResponseEntity<>(authResponse, HttpStatus.NOT_FOUND);
+            responseDTO = generateResponse(e.getMessage());
+            return new ResponseEntity<>(responseDTO, HttpStatus.NOT_FOUND);
         } catch (Exception e) {
-            return new ResponseEntity<>(authResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+            responseDTO = generateResponse(e.getMessage());
+            return new ResponseEntity<>(responseDTO, HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
 
+    private ResponseDTO generateResponse(String message) {
+        ResponseDTO responseDTO = new ResponseDTO();
+        responseDTO.setSuccess(false);
+        responseDTO.setError("Failed to login");
+        responseDTO.setMessage(message);
+        return responseDTO;
     }
 }

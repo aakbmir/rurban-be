@@ -4,6 +4,7 @@ import com.app.rurban.RurbanApplication;
 import com.app.rurban.dto.AuthLoginDTO;
 import com.app.rurban.dto.AuthRegisterDTO;
 import com.app.rurban.dto.AuthResponseDTO;
+import com.app.rurban.dto.ResponseDTO;
 import com.app.rurban.model.CheckIns;
 import com.app.rurban.model.Clinic;
 import com.app.rurban.model.Patient;
@@ -59,7 +60,7 @@ public class AuthService {
         boolean isRegistered = verifyEmailOrPhoneAlreadyRegistered(authRegisterDTO.getEmail(), authRegisterDTO.getContact());
 
         if (isRegistered) {
-            throw new Exception("The email or contact you entered is already registered!!");
+            throw new Exception("The entered email or contact is already registered!!");
         }
         Patient savedPatient = patientRepository.save(convertModelToPatientEntity(authRegisterDTO));
         UserInfo ui = saveLoginCredentials(savedPatient.getPatientEmail(), authRegisterDTO.getPassword());
@@ -78,12 +79,12 @@ public class AuthService {
         if (isRegistered) {
             throw new Exception("The email or contact you entered is already registered!!");
         }
+
         Clinic savedClinic = clinicRepository.save(convertModelToErEntity(authRegisterDTO));
         UserInfo ui = saveLoginCredentials(savedClinic.getClinicEmail(), authRegisterDTO.getPassword());
         sendEmail(savedClinic.getClinicName(), ui.getEmail(), ui.getToken());
         return savedClinic;
     }
-
 
     public void sendEmail(String name, String toEmail, String token) {
         try {
@@ -127,7 +128,7 @@ public class AuthService {
         return auth;
     }
 
-    public AuthResponseDTO loginUser(AuthLoginDTO authLoginDTO) throws InvalidAttributeValueException, AccountNotFoundException {
+    public ResponseDTO loginUser(AuthLoginDTO authLoginDTO) throws InvalidAttributeValueException, AccountNotFoundException {
         UserInfo userInfo = userInfoRepository.findByEmailOrPhone(authLoginDTO.getUsername());
         if (userInfo != null) {
             if (userInfo.getVerified() == null) {
@@ -135,7 +136,6 @@ public class AuthService {
             }
             if (userInfo.getPassword().equalsIgnoreCase(authLoginDTO.getPassword())) {
                 return generateJwtToken(userInfo.getEmail());
-
             } else {
                 throw new InvalidAttributeValueException("Invalid Credentials");
             }
@@ -144,8 +144,8 @@ public class AuthService {
         }
     }
 
-    private AuthResponseDTO generateJwtToken(String email) {
-        AuthResponseDTO authResponseDTO = new AuthResponseDTO();
+    private ResponseDTO generateJwtToken(String email) {
+        ResponseDTO authResponseDTO = new ResponseDTO();
 
         String registerType = "";
         Patient p = patientRepository.findByEmail(email);
@@ -161,6 +161,7 @@ public class AuthService {
             authResponseDTO.getDetails().setName(p.getPatientName());
             registerType = "Patient";
         }
+        authResponseDTO.setSuccess(true);
         authResponseDTO.setToken(jwtService.generateToken(email));
         authResponseDTO.setMessage("Success");
         authResponseDTO.setRegisterType(registerType);
