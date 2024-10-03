@@ -12,6 +12,7 @@ import com.app.rurban.model.UserInfo;
 import com.app.rurban.repository.ClinicRepository;
 import com.app.rurban.repository.PatientRepository;
 import com.app.rurban.repository.UserInfoRepository;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
@@ -128,7 +129,7 @@ public class AuthService {
         return auth;
     }
 
-    public ResponseDTO loginUser(AuthLoginDTO authLoginDTO) throws InvalidAttributeValueException, AccountNotFoundException {
+    public ResponseDTO loginUser(AuthLoginDTO authLoginDTO) throws InvalidAttributeValueException, AccountNotFoundException, JSONException {
         UserInfo userInfo = userInfoRepository.findByEmailOrPhone(authLoginDTO.getUsername());
         if (userInfo != null) {
             if (userInfo.getVerified() == null) {
@@ -144,27 +145,33 @@ public class AuthService {
         }
     }
 
-    private ResponseDTO generateJwtToken(String email) {
+    private ResponseDTO generateJwtToken(String email) throws JSONException {
         ResponseDTO authResponseDTO = new ResponseDTO();
 
         String registerType = "";
         Patient p = patientRepository.findByEmail(email);
+        //JSONObject json = new JSONObject();
         if (p == null) {
             Clinic c = clinicRepository.findByEmail(email);
             if (c != null) {
-                authResponseDTO.getDetails().setId(c.getId());
-                authResponseDTO.getDetails().setName(c.getClinicName());
-                registerType = "Hospital";
+
+                authResponseDTO.addDataField("token", jwtService.generateToken(email));
+                authResponseDTO.addDataField("id", c.getId());
+                authResponseDTO.addDataField("name", c.getClinicName());
+                authResponseDTO.addDataField("registerType", "Hospital");
+                //authResponseDTO.setData(json);
             }
         } else {
-            authResponseDTO.getDetails().setId(p.getId());
-            authResponseDTO.getDetails().setName(p.getPatientName());
-            registerType = "Patient";
+          //  json.put("details", new JSONObject().put("token",jwtService.generateToken(email)).put("id", p.getId()).put("name", p.getPatientName()).put("registerType", "Hospital"));
+            //authResponseDTO.setData(json);
+
+            authResponseDTO.addDataField("token", jwtService.generateToken(email));
+            authResponseDTO.addDataField("id", p.getId());
+            authResponseDTO.addDataField("name", p.getPatientName());
+            authResponseDTO.addDataField("registerType", "Patient");
         }
         authResponseDTO.setSuccess(true);
-        authResponseDTO.setToken(jwtService.generateToken(email));
         authResponseDTO.setMessage("Success");
-        authResponseDTO.setRegisterType(registerType);
         return authResponseDTO;
     }
 

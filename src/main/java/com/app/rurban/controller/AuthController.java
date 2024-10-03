@@ -160,23 +160,18 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<Object> getLogin(@RequestBody AuthLoginDTO authLoginDTO) {
-        AuthResponseDTO authResponse = new AuthResponseDTO();
-        ResponseDTO responseDTO = new ResponseDTO();
+
         logger.info("getLogin : {}", authLoginDTO.toString());
         try {
             return new ResponseEntity<>(authService.loginUser(authLoginDTO), HttpStatus.OK);
         } catch (SecurityException e) {
-            responseDTO = generateResponse(e.getMessage());
-            return new ResponseEntity<>(responseDTO, HttpStatus.FORBIDDEN);
+            return new ResponseEntity<>(generateResponse(e.getMessage()), HttpStatus.FORBIDDEN);
         } catch (InvalidAttributeValueException e) {
-            responseDTO = generateResponse(e.getMessage());
-            return new ResponseEntity<>(responseDTO, HttpStatus.UNAUTHORIZED);
+            return new ResponseEntity<>(generateResponse(e.getMessage()), HttpStatus.UNAUTHORIZED);
         } catch (AccountNotFoundException e) {
-            responseDTO = generateResponse(e.getMessage());
-            return new ResponseEntity<>(responseDTO, HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(generateResponse(e.getMessage()), HttpStatus.NOT_FOUND);
         } catch (Exception e) {
-            responseDTO = generateResponse(e.getMessage());
-            return new ResponseEntity<>(responseDTO, HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(generateResponse(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
