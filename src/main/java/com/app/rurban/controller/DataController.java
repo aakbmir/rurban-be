@@ -15,6 +15,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("api/v1/data")
@@ -32,6 +34,20 @@ public class DataController {
     @GetMapping("/status")
     public ResponseEntity<Object> getStatus() {
         return new ResponseEntity<>(dataService.getCurrentLoc(), HttpStatus.OK);
+    }
+
+    @PostMapping("/eta")
+    public String handlePatientRequest(@RequestBody Map<String, List<Integer>> patientRequest) {
+        // Extract patient IDs from the incoming request body
+        List<Integer> patientIds = patientRequest.get("patientid");
+
+        // Convert the list of IDs into a comma-separated string
+        String commaSeparatedPatientIds = patientIds.stream()
+                .map(String::valueOf)  // Convert Integer to String
+                .collect(Collectors.joining(","));
+
+        // Return or use the comma-separated string as needed
+        return "Patient IDs: " + commaSeparatedPatientIds;
     }
 
     @PostMapping("/create-checkin")
